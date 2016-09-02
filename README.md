@@ -34,6 +34,11 @@ docker-compose up -d
 ```
 ###使用演示
 ```bash
+[root@DS-VM-Node170 ~]# curl -LkO https://github.com/xiaoyawl/docker-shadowsocks_r/raw/master/docker-compose.yml
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   155  100   155    0     0     22      0  0:00:07  0:00:06  0:00:01    47
+100   268  100   268    0     0     20      0  0:00:13  0:00:13 --:--:--    67
 [root@DS-VM-Node170 ~]# docker-compose up -d
 Creating network "dockershadowsocksr_default" with the default driver
 Pulling shadowsocks (benyoo/shadowsocks:latest)...
