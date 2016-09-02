@@ -4,130 +4,75 @@
 # Author: LookBack
 # Email: admin#dwhd.org
 # Version:
-# Created Time: 2016年08月31日 星期三 16时29分36秒
+# Created Time: 2016年09月02日 星期五 17时51分49秒
 #########################################################################
 
 set -e
-
 [ "${1:0:1}" = '-' ] && set -- python "$@"
 
-if [[ "$MANYUSER" =~ ^[Yy][Ee][Ss]$ ]]; then
-	if [ ! -f userapiconfig.py ]; then
-		cp apiconfig.py userapiconfig.py
-		cp mysql.json usermysql.json
-		[ -n "$API_INTERFACE" ] && { [[ "$API_INTERFACE" =~ ^sspanelv(2|3(ssr)?)$ ]] && sed -ri "s/^(API_INTERFACE).*/\1 = '${API_INTERFACE}'/" userapiconfig.py; }
-		[ -f user-config.json ] && rm -rf user-config.json
-	fi
+API_INTERFACE=${API_INTERFACE:-mudbjson}
+SERVER=${SERVER:-0.0.0.0}                             #"server": "0.0.0.0",
+SERVER_IPV6=${SERVER_IPV6:-::}                        #"server_ipv6": "::",
+SERVER_PORT=${SERVER_PORT:-8388}                      #"server_port": 8388,
+LOCAL_ADDRESS=${LOCAL_ADDRESS:-127.0.0.1}             #"local_address": "127.0.0.1",
+LOCAL_PORT=${LOCAL_PORT:-1080}                        #"local_port": 1080,
+PASSWORD=${PASSWORD:-m}                               #"password": "m",
+TIMEOUT=${TIMEOUT:-120}                               #"timeout": 120,
+UDP_TIMEOUT=${UDP_TIMEOUT:-60}                        #"udp_timeout": 60,
+METHOD=${METHOD:-aes-256-cfb}                         #"method": "aes-256-cfb",
+PROTOCOL=${PROTOCOL:-auth_sha1_compatible}            #"protocol": "auth_sha1_compatible",
+PROTOCOL_PARAM=${PROTOCOL_PARAM}                      #"protocol_param": "",
+OBFS=${OBFS:-http_simple_compatible}                  #"obfs": "http_simple_compatible",
+OBFS_PARAM=${OBFS_PARAM}                              #"obfs_param": "",
+DNS_IPV6=${DNS_IPV6:-false}                           #"dns_ipv6": false,
+CONNECT_VERBOSE_INFO=${CONNECT_VERBOSE_INFO:-0}       #"connect_verbose_info": 0,
+REDIRECT=${REDIRECT}                                  #"redirect": "",
+FAST_OPEN=${FAST_OPEN:-false}                         #"fast_open": false
 
-	if [ -z "$MYSQL_PASSWORD" ]; then
-		echo >&2 'error:  missing MYSQL_PASSWORD'
-		echo >&2 '  Did you forget to add -e MYSQL_PASSWORD=... ?'
-		exit 1
-	fi
-
-	if [ -z "$MYSQL_USER" ]; then
-		echo >&2 'error:  missing MYSQL_USER'
-		echo >&2 '  Did you forget to add -e MYSQL_USER=... ?'
-		exit 1
-	fi
-
-	MYSQL_PORT=${MYSQL_PORT:-3306}
-	#if [ -z "$MYSQL_PORT" ]; then
-	#	echo >&2 'error:  missing MYSQL_PORT'
-	#	echo >&2 '  Did you forget to add -e MYSQL_PORT=... ?'
-	#	exit 1
-	#fi
-
-	if [ -z "$MYSQL_HOST" ]; then
-		echo >&2 'error:  missing MYSQL_HOST'
-		echo >&2 '  Did you forget to add -e MYSQL_HOST=... ?'
-		exit 1
-	fi
-
-	if [ -z "$MYSQL_DBNAME" ]; then
-		echo >&2 'error:  missing MYSQL_DBNAME'
-		echo >&2 '  Did you forget to add -e MYSQL_DBNAME=... ?'
-		exit 1
-	fi
-
-	for i in $MYSQL_USER $MYSQL_PORT $MYSQL_HOST $MYSQL_DBNAME $MYSQL_PASSWORD; do
-		if grep '@' <<<"$i" >/dev/null 2>&1; then
-			echo >&2 "error:  missing -e $i"
-			echo >&2 "  You can't special characters '@'"
-			exit 1
-		fi
-	done
-
-	sed -ri "s@^(MYSQL_HOST = ).*@\1'$MYSQL_HOST'@" usermysql.json
-	sed -ri "s@^(MYSQL_PORT = ).*@\1$MYSQL_PORT@" usermysql.json
-	sed -ri "s@^(MYSQL_USER = ).*@\1'$MYSQL_USER'@" usermysql.json
-	sed -ri "s@^(MYSQL_PASS = ).*@\1'$MYSQL_PASSWORD'@" usermysql.json
-	sed -ri "s@^(MYSQL_DB = ).*@\1'$MYSQL_DBNAME'@" usermysql.json
-elif [[ "$MANYUSER" =~ ^[Nn][Oo]$ ]]; then
-	[ -f userapiconfig.py ] && rm -rf userapiconfig.py
-	[ -f usermysql.json ] && rm -rf usermysql.json
-	[ ! -f user-config.json ] && cp config.json user-config.json
-	[ -n "${SERVER_PORT}" ] && sed -ri "s/(\"server_port\":).*/\1 ${SERVER_PORT},/" user-config.json
-	[ -n "${LOCAL_ADDRESS}" ] && sed -ri "s/(\"local_address\":).*/\1 \"${LOCAL_ADDRESS}\",/" user-config.json
-	[ -n "${LOCAL_PORT}" ] && sed -ri "s/(\"local_port\":).*/\1 ${LOCAL_PORT},/" user-config.json
-	[ -n "${PASSWORD}" ] && sed -ri "s/(\"password\":).*/\1 \"${PASSWORD}\",/" user-config.json
-else
+if [ -z ${MANYUSER} ]; then
 	echo >&2 'error:  missing MANYUSER'
-	echo >&2 '  Did you forget to add -e MANYUSER=... ?'
-	echo >&2 "  Variable MANYUSER accept only yes and no assignment."
+	echo >&2 ' Did you forget to add -e MANYUSER=... ?'
+	echo >&2 ' You can add -e MANYUSER=[Yes|No], If you add -e MANYUSER=Yes, You must to be add -e SSR_SQL=Yes or SSR_JSON=Yes.'
 	exit 1
 fi
 
-if [ "$MANYUSER" = "R" ]; then
-	if [ -z "$PROTOCOL" ]; then
-		echo >&2 'error:  missing PROTOCOL'
-		echo >&2 '  Did you forget to add -e PROTOCOL=... ?'
-		exit 1
-	elif [[ ! "$PROTOCOL" =~ ^(origin|verify_simple|verify_deflate|auth_simple)$ ]]; then
-		echo >&2 'error : missing PROTOCOL'
-		echo >&2 '  You must be used -e PROTOCOL=[origin|verify_simple|verify_deflate|auth_simple]'
-		exit 1
-	fi
-
-	if [ -z "$OBFS" ]; then
-		echo >&2 'error:  missing OBFS'
-		echo >&2 '  Did you forget to add -e OBFS=... ?'
-		exit 1
-	elif [[ ! "$OBFS" =~ ^(plain|http_simple|http_simple_compatible|tls_simple|tls_simple_compatible|random_head|random_head_compatible)$ ]]; then
-		echo >&2 'error:  missing OBFS'
-		echo >&2 '  You must be used -e OBFS=[plain|http_simple|http_simple_compatible|tls_simple|tls_simple_compatible|random_head|random_head_compatible]'
+if [[ "$MANYUSER" =~ ^[Yy][Ee][Ss]$ ]]; then
+	if [[ "$SSR_SQL" =~ ^[Yy][Ee][Ss]$ ]]; then
+		echo "Beta"
+	elif [[ "$SSR_JSON" =~ ^[Yy][Ee][Ss]$ ]]; then
+		[ ! -f userapiconfig.py ] && cp apiconfig.py userapiconfig.py || cat apiconfig.py > userapiconfig.py
+		sed -ri "s/^(API_INTERFACE =).*/\1 '${API_INTERFACE}'/" userapiconfig.py
+		#method:aes-128-cfb aes-192-cfb aes-256-cfb rc4-md5 rc4-md5-6 chacha20 chacha20-ietf salsa20 bf-cfb camellia-128-cfb camellia-192-cfb camellia-256-cfb aes-128-ctr aes-192-ctr aes-256-ctr
+		#^((aes|camellia)-(128|192|256)-(cfb|ctr)|bf-cfb|rc4-md5(-6)?|chacha20(-ietf)?)$
+		#^(aes-(128|192|256)-cfb|rc4-md5(-6)?|chacha20(-ietf)?|bf-cfb|camellia-(128|192|256)-cfb|aes-(128|192|256)-ctr)$
+		#protocol: origin verify_sha1_compatible verify_sha1 auth_sha1_compatible auth_sha1 auth_sha1_v2_compatible auth_sha1_v2 auth_sha1_v3_compatible auth_sha1_v3
+		#obfs: plain http_simple_compatible  http_simple tls1.2_ticket_auth_compatible tls1.2_ticket_auth
+	else
+		echo >&2 'error:  missing MANYUSER'
+		echo >&2 ' If you add -e MANYUSER=Yes, Maybe you forgot to add -e SSR_SQL=Yes or SSR_JSON=Yes .'
 		exit 1
 	fi
-
-	if [ -z "$OBFS_PARAM" ]; then
-		echo >&2 'error:  missing OBFS_PARAM'
-		echo >&2 '  Did you forget to add -e OBFS_PARAM=... ?'
-		exit 1
-	fi
-
-	if [ -n "$METHOD" ]; then
-		if [[ ! "$METHOD" =~ ^(aes-(256|192|128)-cfb|(chacha|salsa)20|rc4-md5)$ ]]; then
-			echo >&2 'error:  missing METHOD'
-			echo >&2 '  You must be used -e METHOD=[aes-256-cfb|aes-192-cfb|aes-128-cfb|chacha20|salsa20|rc4-md5]'
-			exit 1
-		else
-			sed -ri "s@^(.*\"method\": ).*@\1\"$METHOD\",@" /shadowsocks/config.json
-		fi
-	fi
-
-	if [ -n "$DNS_IPV6" ]; then
-		if [[ ! "$DNS_IPV6" =~ ^(false|true)$ ]]; then
-			echo >&2 'error:  missing DNS_IPV6'
-			echo >&2 '  You must be used -e DNS_IPV6=[false|true]'
-			exit 1
-		else
-			sed -ri "s@^(.*\"dns_ipv6\": ).*@\1\"$DNS_IPV6\",@" /shadowsocks/config.json
-		fi
-	fi
-
-	sed -ri "s@^(.*\"protocol\": ).*@\1\"$PROTOCOL\",@" /shadowsocks/config.json
-	sed -ri "s@^(.*\"obfs\": ).*@\1\"$OBFS\",@" /shadowsocks/config.json
-	sed -ri "s@^(.*\"obfs_param\": ).*@\1\"$OBFS_PARAM\",@" /shadowsocks/config.json
+elif [[ "$MANYUSER" =~ ^[No][Oo]$ ]]; then
+	[ ! -f user-config.json ] && cat config.json > user-config.json
+	[ -f userapiconfig.py ] && rm -rf userapiconfig.py
+	[ -f usermysql.json ] && rm -rf usermysql.json
+	sed -ri "s/(\"server\":).*/\1 \"${SERVER}\",/" user-config.json
+	sed -ri "s/(\"server_ipv6\":).*/\1 \"${SERVER_IPV6}\",/" user-config.json
+	sed -ri "s/(\"server_port\":).*/\1 ${SERVER_PORT},/" user-config.json
+	sed -ri "s/(\"local_address\":).*/\1 \"${LOCAL_ADDRESS}\",/" user-config.json
+	sed -ri "s/(\"local_port\":).*/\1 ${LOCAL_PORT},/" user-config.json
+	sed -ri "s/(\"password\":).*/\1 \"${PASSWORD}\",/" user-config.json
+	sed -ri "s/(\"timeout\":).*/\1 \"${TIMEOUT}\",/" user-config.json
+	sed -ri "s/(\"udp_timeout\":).*/\1 \"${UDP_TIMEOUT}\",/" user-config.json
+	sed -ri "s/(\"method\":).*/\1 \"${METHOD}\",/" user-config.json
+	sed -ri "s/(\"protocol\":).*/\1 \"${PROTOCOL}\",/" user-config.json
+	sed -ri "s/(\"protocol_param\":).*/\1 \"${PROTOCOL_PARAM}\",/" user-config.json
+	sed -ri "s/(\"obfs\":).*/\1 \"${OBFS}\",/" user-config.json
+	sed -ri "s/(\"obfs_param\":).*/\1 \"${OBFS_PARAM}\",/" user-config.json
+	sed -ri "s/(\"dns_ipv6\":).*/\1 \"${DNS_IPV6}\",/" user-config.json
+	sed -ri "s/(\"connect_verbose_info\":).*/\1 \"${CONNECT_VERBOSE_INFO}\",/" user-config.json
+	sed -ri "s/(\"redirect\":).*/\1 \"${REDIRECT}\",/" user-config.json
+	sed -ri "s/(\"fast_open\":).*/\1 \"${FAST_OPEN}\"/" user-config.json
 fi
 
-exec python ${DATA_DIR}/shadowsocks/server.py
+exec "${@}" ${DATA_DIR}/shadowsocks/server.py
