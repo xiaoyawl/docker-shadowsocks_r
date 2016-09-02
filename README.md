@@ -32,6 +32,30 @@ docker pull benyoo/shadowsocks:latest
 curl -LkO https://github.com/xiaoyawl/docker-shadowsocks_r/raw/master/docker-compose.yml
 docker-compose up -d
 ```
+###使用演示
+```bash
+[root@DS-VM-Node170 ~]# docker-compose up -d
+Creating network "dockershadowsocksr_default" with the default driver
+Pulling shadowsocks (benyoo/shadowsocks:latest)...
+latest: Pulling from benyoo/shadowsocks
+
+e110a4a17941: Already exists
+9afdf360130b: Pull complete
+03fe7695267b: Pull complete
+61cfeeb7ee42: Pull complete
+Digest: sha256:bfb2c014d1a828430fa567286101f78906b6472183b81479d535b2dc750f57dd
+Status: Downloaded newer image for benyoo/shadowsocks:latest
+Creating shadowsocks_server
+[root@DS-VM-Node170 ~]# docker logs shadowsocks_server 
+loaded collections.OrderedDict
+INFO: loading config from user-config.json
+2016-09-02 13:02:31 INFO     util.py:85 loading libcrypto from libcrypto.so.1.0.0
+2016-09-02 13:02:31 INFO     asyncdns.py:324 dns server: [('127.0.0.11', 53)]
+2016-09-02 13:02:31 INFO     server.py:98 server start with protocol[auth_sha1_compatible] password [lookback] method [aes-256-cfb] obfs [http_simple_compatible] obfs_param []
+2016-09-02 13:02:31 INFO     server.py:114 starting server at [::]:10000
+2016-09-02 13:02:31 INFO     server.py:134 starting server at 0.0.0.0:10000
+[root@DS-VM-Node170 ~]# 
+```
 ##3、变量说明
 | 变量名                  | 默认值                    | 描述                                       |
 | -------------------- | ---------------------- | ---------------------------------------- |
@@ -60,3 +84,6 @@ docker-compose up -d
 
 ##4、 基于Arukas.io 的使用演示
 222
+```
+
+```
