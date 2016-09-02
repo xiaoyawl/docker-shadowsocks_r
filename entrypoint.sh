@@ -68,6 +68,7 @@ elif [[ "$MANYUSER" =~ ^[No][Oo]$ ]]; then
 	sed -ri "s/(\"protocol\":).*/\1 \"${PROTOCOL}\",/" user-config.json
 	sed -ri "s/(\"protocol_param\":).*/\1 \"${PROTOCOL_PARAM}\",/" user-config.json
 	sed -ri "s/(\"obfs\":).*/\1 \"${OBFS}\",/" user-config.json
+	[ -n ${OBFS_PARAM} ] && OBFS_PARAM=$(sed 's@/@\\/@g' <<< $OBFS_PARAM)
 	sed -ri "s/(\"obfs_param\":).*/\1 \"${OBFS_PARAM}\",/" user-config.json
 	sed -ri "s/(\"dns_ipv6\":).*/\1 \"${DNS_IPV6}\",/" user-config.json
 	sed -ri "s/(\"connect_verbose_info\":).*/\1 \"${CONNECT_VERBOSE_INFO}\",/" user-config.json
