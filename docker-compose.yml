@@ -1,0 +1,13 @@
+version: '2'
+services:
+  shadowsocks:
+    container_name: shadowsocks_server
+    restart: always
+    image: benyoo/shadowsocks:latest
+    ports:
+    - "10000:10000"
+    environment:
+    - MANYUSER=No
+    - SERVER=0.0.0.0
+    - SERVER_PORT=10000
+    - PASSWORD=lookback
