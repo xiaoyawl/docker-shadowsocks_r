@@ -1,3 +1,5 @@
+[![](https://images.microbadger.com/badges/image/benyoo/shadowsocks.svg)](http://microbadger.com/images/benyoo/shadowsocks "Get your own image badge on microbadger.com")[![](https://images.microbadger.com/badges/version/benyoo/shadowsocks.svg)](http://microbadger.com/images/benyoo/shadowsocks "Get your own version badge on microbadger.com")
+
 # 一、Docker-ShadowsocksR 服务端
 ##1、介绍
 基于Dockerfile文件编译出一个ShadowsocksR服务端的容器镜像。
