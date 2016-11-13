@@ -1,11 +1,11 @@
 [![](https://images.microbadger.com/badges/image/benyoo/shadowsocks.svg)](http://microbadger.com/images/benyoo/shadowsocks "Get your own image badge on microbadger.com")[![](https://images.microbadger.com/badges/version/benyoo/shadowsocks.svg)](http://microbadger.com/images/benyoo/shadowsocks "Get your own version badge on microbadger.com")[![Docker Pulls](https://img.shields.io/docker/pulls/benyoo/shadowsocks.svg?maxAge=2592000)](https://hub.docker.com/r/benyoo/shadowsocks/)[![Docker Automated buil](https://img.shields.io/docker/automated/benyoo/shadowsocks.svg?maxAge=2592000)](https://hub.docker.com/r/benyoo/shadowsocks/)
 
 # 一、Docker-ShadowsocksR 服务端
-##1、介绍
+## 1、介绍
 基于Dockerfile文件编译出一个ShadowsocksR服务端的容器镜像。
-##2、版本
+## 2、版本
 当前版本：[benyoo/shadowsocks:3.8.5.2](https://hub.docker.com/r/benyoo/shadowsocks/)
-##3、问题
+## 3、问题
 如何安装Docker
 ```bash
 curl -Lk https://get.docker.com/ | sh
@@ -21,7 +21,7 @@ RHEL、CentOS、Fedora的用户可以使用`setenforce 0`来禁用selinux以达�
 - 提供 `docker run` 命令的详情 (注意打码你的隐私信息).
 
 # 二、安装&使用
-##1、基于docker的ShadowsocksR服务端安装方法
+## 1、基于docker的ShadowsocksR服务端安装方法
 直接使用我们在 [Dockerhub](https://hub.docker.com/r/benyoo/shadowsocks/) 上通过自动构建生成的镜像是最为推荐的方式
 
 > **Note**: 也可以在 [Quay.io](https://quay.io/repository/benyoo/shadowsocks)上构建
@@ -29,12 +29,12 @@ RHEL、CentOS、Fedora的用户可以使用`setenforce 0`来禁用selinux以达�
 ```bash
 docker pull benyoo/shadowsocks:latest
 ```
-##2、使用docker-compose来快速部署
+## 2、使用docker-compose来快速部署
 ```bash
 curl -LkO https://github.com/xiaoyawl/docker-shadowsocks_r/raw/master/docker-compose.yml
 docker-compose up -d
 ```
-###使用演示
+### 使用演示
 ```bash
 [root@DS-VM-Node170 ~]# curl -LkO https://github.com/xiaoyawl/docker-shadowsocks_r/raw/master/docker-compose.yml
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
@@ -63,7 +63,7 @@ INFO: loading config from user-config.json
 2016-09-02 13:02:31 INFO     server.py:134 starting server at 0.0.0.0:10000
 [root@DS-VM-Node170 ~]# 
 ```
-##3、变量说明
+## 3、变量说明
 |         变量名        |          默认值         |       描述                                |
 | -------------------- | ---------------------- | ---------------------------------------- |
 | SERVER               | 0.0.0.0                | 当服务器上有多IP的时候之允许单个IP的时候使用，在Docker环境中不建议使用。 |
@@ -89,7 +89,7 @@ INFO: loading config from user-config.json
 | SSR_JSON             |                        |                                          |
 
 
-##4、 基于Arukas.io 的使用演示
+## 4、 基于Arukas.io 的使用演示
 222
 ```
 
